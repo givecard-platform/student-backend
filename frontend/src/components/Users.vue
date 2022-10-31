@@ -9,6 +9,7 @@
           <tr> 
             <th>First Name</th>
             <th>Last Name</th>
+            <th>ID</th>
             <th>Email</th>
             <th>Status</th>
             <th>Update</th>
@@ -20,6 +21,7 @@
           
             <td>{{ user.firstName }}</td>
             <td>{{ user.lastName }}</td>
+            <td>{{ user.id }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.status }}</td>
             <td>
@@ -46,11 +48,13 @@
 </template>
 <script>
 import UserDataService from "../service/UserDataService";
+//import { uuid } from 'vue-uuid';
 
 export default {
   name: "Users",
   data() {
     return {
+      //uuid: uuid.v1(),
       users: [],
       message: "",
     };
@@ -59,10 +63,13 @@ export default {
     refreshUsers() {
       UserDataService.retrieveAllUsers().then((res) => {
         this.users = res.data;
+        //this.uuid = uuid.v1()
       });
     },
     addUser() {
       this.$router.push(`/user/-1`);
+      //this.$router.push(`/user/${this.uuid}`);
+      //this.$router.push(`/user/` + this.uuid);
     },
     updateUser(id) {
       this.$router.push(`/user/${id}`);

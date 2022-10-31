@@ -35,14 +35,21 @@
 </template>
 <script>
 import UserDataService from "../service/UserDataService";
+//import { uuid } from 'vue-uuid';
 
 export default {
   name: "User",
   data() {
     return {
+      //id:  uuid.v1(),
+      //id : "",
       firstName: "",
       lastName: "",
       email: "",
+      status: "",
+      dob: "",
+      phoneNumber: "",
+      city: "",
       errors: [],
     };
   },
@@ -50,17 +57,18 @@ export default {
     id() {
       return this.$route.params.id;
     },
-    status() {
-      return this.$route.params.status;
-    }
   },
   methods: {
     refreshUserDetails() {
       UserDataService.retrieveUser(this.id).then((res) => {
+        //this.id = res.data.id;
         this.firstName = res.data.firstName;
         this.lastName = res.data.lastName;
         this.email = res.data.email;
-        this.status = res.status;
+        this.status = res.data.status;
+        this.dob = res.data.dob;
+        this.phoneNumber = res.data.phoneNumber;
+        this.city = res.data.city;
       });
     },
     validateAndSubmit(e) {
@@ -81,22 +89,30 @@ export default {
       if (this.errors.length === 0) {
         if (this.id == -1) {
           UserDataService.createUser({
-            firstName: this.firstName,
-            lastName: this.lastName,
-            email: this.email,
-            status: this.status,
-          }).then(() => {
-            this.$router.push("/users");
-          });
+              //id: this.uuid,
+              firstName: this.firstName,
+              lastName: this.lastName,
+              email: this.email,
+              status: this.status,
+              dob: this.dob,
+              phoneNumber: this.phoneNumber,
+              city: this.city,
+            }).then(() => {
+              this.$router.push({path: `/users/home`})
+              //this.$router.push({path: "/users/home"});
+            });
         } else {
           UserDataService.updateUser(this.id, {
-            id: this.id,
+            //id: this.uuid,
             firstName: this.firstName,
             lastName: this.lastName,
             email: this.email,
             status: this.status,
+            dob: this.dob,
+            phoneNumber: this.phoneNumber,
+            city: this.city,
           }).then(() => {
-            this.$router.push("/users");
+            this.$router.push({path: "/user/" + this.id + "/next"})
           });
         }
       }
