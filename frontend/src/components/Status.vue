@@ -11,6 +11,9 @@
             <th>Last Name</th>
             <th>Email</th>
             <th>Status</th>
+            <th>DoB</th>
+            <th>Phone Number</th>
+            <th>City</th>
           </tr>
         </thead>
         <tbody>
@@ -20,6 +23,9 @@
             <td>{{ user.lastName }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.status }}</td>
+            <td>{{ user.dob }}</td>
+            <td>{{ user.phoneNumber }}</td>
+            <td>{{ user.city }}</td>
           </tr>
         </tbody>
       </table>
@@ -40,7 +46,10 @@ export default {
     computed: {
     id() {
       return this.$route.params.id;
-    }
+    },
+    //status() {
+    //  return this.$route.params.status;
+    //}
   },
   methods: {
     displayUser() {

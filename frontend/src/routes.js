@@ -26,6 +26,16 @@ const router = new Router({
             name: "User",
             component: () => import("./components/Status"),
         },
+        {
+            path: "/users/home",
+            name: "Frontpage",
+            component: () => import("./components/Frontpage"),
+        },
+        {
+            path: "/user/:id/next",
+            name: "Next",
+            component: () => import("./components/Next"),
+        },
     ]
 });
 

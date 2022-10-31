@@ -54,25 +54,28 @@ func Routers() {
 }
 
 type User struct {
-	ID        string `json:"id"`
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-	Email     string `json:"email"`
-	Status    string `json:"status"`
+	ID          string `json:"id"`
+	FirstName   string `json:"firstName"`
+	LastName    string `json:"lastName"`
+	Email       string `json:"email"`
+	Status      string `json:"status"`
+	DoB         string `json:"dob"`
+	PhoneNumber string `json:"phoneNumber"`
+	City        string `json:"city"`
 }
 
 // Get all users
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var users []User
-	result, err := db.Query("SELECT id, first_name, last_name, email, status from users")
+	result, err := db.Query("SELECT id, first_name, last_name, email, status, dob, phone_number, city from users")
 	if err != nil {
 		panic(err.Error())
 	}
 	defer result.Close()
 	for result.Next() {
 		var user User
-		err := result.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Status)
+		err := result.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Status, &user.DoB, &user.PhoneNumber, &user.City)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -85,7 +88,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	stmt, err := db.Prepare("INSERT INTO users (id, first_name, last_name, email, status) VALUES ($1, $2, $3, $4, $5)")
+	stmt, err := db.Prepare("INSERT INTO users (id, first_name, last_name, email, status, dob, phone_number, city) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -95,6 +98,8 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	keyVal := make(map[string]string)
 	json.Unmarshal(body, &keyVal)
+	//id := keyVal["id"]
+	//id := strings.Split((r.URL.Path), "/")[2]
 	id := (uuid.New()).String()
 	print("ID:", id)
 	first_name := keyVal["firstName"]
@@ -104,7 +109,10 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	// or hardset the initial status to "pending", then after the user is created, call a function
 	// to do this so that the user experience of creating an application is not slow (better option).
 	status := "pending"
-	_, err = stmt.Exec(id, first_name, last_name, email, status)
+	dob := keyVal["dob"]
+	phone_number := keyVal["phoneNumber"]
+	city := keyVal["city"]
+	_, err = stmt.Exec(id, first_name, last_name, email, status, dob, phone_number, city)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -115,15 +123,14 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	result, err := db.Query("SELECT id, first_name, last_name, email, status from users WHERE id = $1", params["id"])
+	result, err := db.Query("SELECT id, first_name, last_name, email, status, dob, phone_number, city from users WHERE id = $1", params["id"])
 	if err != nil {
 		panic(err.Error())
 	}
 	defer result.Close()
 	var user User
 	for result.Next() {
-		err := result.Scan(&user.ID, &user.FirstName,
-			&user.LastName, &user.Email, &user.Status)
+		err := result.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Status, &user.DoB, &user.PhoneNumber, &user.City)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -135,7 +142,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	stmt, err := db.Prepare("UPDATE users SET first_name = $1, last_name = $2, email = $3, status= $4 WHERE id = $5")
+	stmt, err := db.Prepare("UPDATE users SET first_name = $1, last_name = $2, email = $3, status= $4, dob = $5, phone_number = $6, city = $7 WHERE id = $8")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -149,7 +156,10 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	last_name := keyVal["lastName"]
 	email := keyVal["email"]
 	status := keyVal["status"]
-	_, err = stmt.Exec(first_name, last_name, email, status, params["id"])
+	dob := keyVal["dob"]
+	phone_number := keyVal["phoneNumber"]
+	city := keyVal["city"]
+	_, err = stmt.Exec(first_name, last_name, email, status, dob, phone_number, city, params["id"])
 	if err != nil {
 		panic(err.Error())
 	}
